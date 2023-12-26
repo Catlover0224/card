@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>티어 선택</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: black;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #00faff;
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>티어 및 성향 선택</h1>
+
+        <label for="tier">티어:</label>
+        <select id="tier" onchange="updateResult()">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select>
+
+        <br>
+
+        <label>행동 성향:</label>
+        <label><input type="radio" name="behavior" value="공격" onclick="updateResult()"> 공격</label>
+        <label><input type="radio" name="behavior" value="탐색" onclick="updateResult()"> 탐색</label>
+
+        <br>
+
+        <button onclick="drawCard()">카드 뽑기</button>
+
+        <div id="result"></div>
+    </div>
+
+    <div id="footer">이은우</div>
+
+    <script>
+        const cardData = {
+            "0": {
+                "공격": [
+                    { name: "0T(A)", content: "공격 판정 시, 주사위+3, 힘+1 [침식치 +15]" },
+                    { name: "0T(A)", content: "공격 판정 시, 주사위+4 [침식치 +15]" },
+                    { name: "0T(B)", content: "공격 판정 시, 주사위+2, 힘+1 [침식치 +8]" },
+                    { name: "0T(B)", content: "공격 판정 시, 주사위+3 [침식치 +8]" },
+                    { name: "0T(C)", content: "공격 판정 시, 주사위+2, 힘+1 [침식치 +9]" },
+                    { name: "0T(C)", content: "공격 판정 시, 주사위+3 [침식치 +9]" },
+                    { name: "0T(D)", content: "공격 판정 시, 주사위+2, 힘+1 [침식치 +10]" },
+                    { name: "0T(D)", content: "공격 판정 시, 주사위+3 [침식치 +10]" },
+                    { name: "0T(S)", content: "공격 판정 시, 주사위+4, 힘+3 [침식치 +15]" },
+                    // 0티어 공격 카드들
+                ],
+                "탐색": [
+                    // 0티어 탐색 카드들
+                    { name: "0T(A)", content: "탐색 판정 시, 주사위+3, 기준-1 [침식치 +14]" },
+                    { name: "0T(A)", content: "탐색 판정 시, 주사위+1 [침식치 +5]" },
+                    { name: "0T(B)", content: "탐색 판정 시, 주사위+1, 기준-1 [침식치 +15]" },
+                    { name: "0T(B)", content: "탐색 판정 시, 주사위+1 [침식치 +6]" },
+                    { name: "0T(C)", content: "탐색 판정 시, 주사위+1 [침식치 +8]" },
+                    { name: "0T(C)", content: "탐색 판정 시, 주사위+1 [침식치 +7]" },
+                    { name: "0T(D)", content: "탐색 판정 시, 주사위+1 [침식치 +10]" },
+                    { name: "0T(D)", content: "탐색 판정 시, 주사위+1 [침식치 +9]" },
+                    { name: "0T(S)", content: "탐색 판정 시, 주사위+2, 기준-1 [침식치 +12]" },
+                    { name: "0T(S)", content: "탐색 판정 시, 주사위+2 [침식치 +4]" },
+                ]
+            },
+            "1": {
+                "공격": [
+                    // 1티어 공격 카드들
+                    { name: "1T(A)", content: "공격 판정 시, 주사위+2, 힘+1 [침식치 +15]" },
+                    { name: "1T(A)", content: "공격 판정 시, 주사위+3 [침식치 +15]" },
+                    { name: "1T(B)", content: "공격 판정 시, 주사위+1, 힘+1 [침식치 +8]" },
+                    { name: "1T(B)", content: "공격 판정 시, 주사위+2 [침식치 +8]" },
+                    { name: "1T(C)", content: "공격 판정 시, 주사위+1, 힘+1 [침식치 +9]" },
+                    { name: "1T(C)", content: "공격 판정 시, 주사위+2 [침식치 +9]" },
+                    { name: "1T(D)", content: "공격 판정 시, 주사위+1, 힘+1 [침식치 +10]" },
+                    { name: "1T(D)", content: "공격 판정 시, 주사위+2 [침식치 +10]" },
+                    { name: "1T(S)", content: "공격 판정 시, 주사위+3, 힘+2 [침식치 +15]" },
+                ],
+                "탐색": [
+                    // 1티어 탐색 카드들
+                    { name: "1T(A)", content: "탐색 판정 시, 주사위+2, 기준-1 [침식치 +17]" },
+                    { name: "1T(A)", content: "탐색 판정 시, 주사위+2 [침식치 +5]" },
+                    { name: "1T(B)", content: "탐색 판정 시, 주사위+2, 기준-1 [침식치 +18]" },
+                    { name: "1T(B)", content: "탐색 판정 시, 주사위+2 [침식치 +6]" },
+                    { name: "1T(C)", content: "탐색 판정 시, 주사위+2, 기준-1 [침식치 +19]" },
+                    { name: "1T(C)", content: "탐색 판정 시, 주사위+2 [침식치 +7]" },
+                    { name: "1T(D)", content: "탐색 판정 시, 주사위+2, 기준-1 [침식치 +20]" },
+                    { name: "1T(D)", content: "탐색 판정 시, 주사위+2 [침식치 +8]" },
+                    { name: "1T(S)", content: "탐색 판정 시, 주사위+3, 기준-1 [침식치 +16]" },
+                    { name: "1T(S)", content: "탐색 판정 시, 주사위+3 [침식치 +4]" },
+                ]
+            },
+            "2": {
+                "공격": [
+                    // 2티어 공격 카드들
+                    { name: "2T(A)", content: "공격 판정 시, 주사위+3, 힘-1 [침식치 +20]" },
+                    { name: "2T(A)", content: "공격 판정 시, 주사위+2 [침식치 +15]" },
+                    { name: "2T(B)", content: "공격 판정 시, 주사위+3 [침식치 +25]" },
+                    { name: "2T(B)", content: "공격 판정 시, 주사위+1 [침식치 +8]" },
+                    { name: "2T(C)", content: "공격 판정 시, 주사위+3 [침식치 +30]" },
+                    { name: "2T(C)", content: "공격 판정 시, 주사위+1 [침식치 +9]" },
+                    { name: "2T(D)", content: "공격 판정 시, 주사위+2 [침식치 +25]" },
+                    { name: "2T(D)", content: "공격 판정 시, 주사위+1 [침식치 +10]" },
+                    { name: "2T(S)", content: "공격 판정 시, 주사위+2, 힘+1 [침식치 +15]" },
+                ],
+                "탐색": [
+                    // 2티어 탐색 카드들
+                    { name: "2T(A)", content: "탐색 판정 시, 주사위+3, 기준-2 [침식치 +17]" },
+                    { name: "2T(A)", content: "탐색 판정 시, 주사위+3 [침식치 +5]" },
+                    { name: "2T(B)", content: "탐색 판정 시, 주사위+3, 기준-2 [침식치 +18]" },
+                    { name: "2T(B)", content: "탐색 판정 시, 주사위+3 [침식치 +6]" },
+                    { name: "2T(C)", content: "탐색 판정 시, 주사위+3, 기준-2 [침식치 +19]" },
+                    { name: "2T(C)", content: "탐색 판정 시, 주사위+3 [침식치 +7]" },
+                    { name: "2T(D)", content: "탐색 판정 시, 주사위+3, 기준-2 [침식치 +20]" },
+                    { name: "2T(D)", content: "탐색 판정 시, 주사위+3 [침식치 +8]" },
+                    { name: "2T(S)", content: "탐색 판정 시, 주사위+4, 기준-2 [침식치 +16]" },
+                    { name: "2T(S)", content: "탐색 판정 시, 주사위+4 [침식치 +4]" },
+                ]
+            }
+        };
+
+        function updateResult() {
+            var tier = document.getElementById("tier").value;
+            var behavior = document.querySelector('input[name="behavior"]:checked');
+            var resultElement = document.getElementById("result");
+
+            if (tier !== "" && behavior !== null) {
+                var result = "선택한 티어: " + tier + "<br>선택한 성향: " + behavior.value;
+                resultElement.innerHTML = result;
+            }
+        }
+
+        function drawCard() {
+            var tier = document.getElementById("tier").value;
+            var behavior = document.querySelector('input[name="behavior"]:checked');
+            var resultElement = document.getElementById("result");
+
+            if (tier !== "" && behavior !== null) {
+                var cards = cardData[tier][behavior.value];
+                var randomIndex = Math.floor(Math.random() * cards.length);
+                var selectedCard = cards[randomIndex];
+
+                var result = "선택한 티어: " + tier + "<br>선택한 성향: " + behavior.value + "<br>뽑은 카드: " + selectedCard.name + "<br>카드 내용: " + selectedCard.content;
+                resultElement.innerHTML = result;
+            }
+        }
+    </script>
+</body>
+</html>
